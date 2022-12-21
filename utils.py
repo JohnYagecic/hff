@@ -170,6 +170,7 @@ def plot_cooling_rate(cooling_rate):
     fig, ax = plt.subplots(figsize=(15, 5))
     ax = sns.lineplot(cooling_rate)
     ax.axhline(-1.29*10**-3,linestyle='--',color='k')
+    plt.ylabel('Cooling Rate (C/min)',fontsize=12)
     return fig
 
 def plot_parcel_cooling(cooling_rate,T_water_C):
@@ -186,4 +187,5 @@ def plot_parcel_cooling(cooling_rate,T_water_C):
     temps = pd.melt(temps.reset_index(),id_vars='index')
     fig, ax = plt.subplots(figsize=(15, 5))
     ax = sns.lineplot(data=temps, x="index", y="value",hue='variable')
+    plt.ylabel('Water Temp (C)',fontsize=12)
     return fig
