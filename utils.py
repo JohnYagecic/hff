@@ -165,3 +165,25 @@ def plot_met(df):
     g = sns.FacetGrid(df_met, row="variable",aspect=4,sharey=False,hue='variable')
     g.map(sns.lineplot, "date", "value")
     return g
+
+def plot_cooling_rate(cooling_rate):
+    fig, ax = plt.subplots(figsize=(15, 5))
+    ax = sns.lineplot(cooling_rate)
+    ax.axhline(-1.29*10**-3,linestyle='--',color='k')
+    return fig
+
+def plot_parcel_cooling(cooling_rate,T_water_C):
+    cooling_rate_hr = cooling_rate*60
+
+    temps = pd.DataFrame(cooling_rate_hr)
+    cooling_cumsum = cooling_rate_hr.cumsum()
+    for i in range(100):
+        c = cooling_cumsum-cooling_cumsum[i]
+        c[0:i]=0
+        temps[i] = c
+    temps = temps + T_water_C
+    temps[temps<0] = 0
+    temps = pd.melt(temps.reset_index(),id_vars='index')
+    fig, ax = plt.subplots(figsize=(15, 5))
+    ax = sns.lineplot(data=temps, x="index", y="value",hue='variable')
+    return fig

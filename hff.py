@@ -20,11 +20,13 @@ with col1:
 with col2:
    lon = st.number_input('longitude',value=-101.3644337)
    T_water_C = st.number_input('water temperature (C)',value=2)
+   D = st.number_input('characteristic depth (m)',value=2)
+
 
 if st.button('Get Current Forecast'):
+	
 	df = get_full_forecast(lat,lon)
 
-	T_water_C = 0
 	q_sw, q_atm, q_b, q_l, q_h, q_net = calc_fluxes(df,T_water_C,lat,lon)
 
 	energy_df = build_energy_df(q_sw, q_atm, q_b, q_l, q_h)
@@ -33,3 +35,11 @@ if st.button('Get Current Forecast'):
 
 	g = plot_met(df)
 	st.pyplot(g)
+
+	pw = 1000 #kg/m^3 density of water
+	cpw = 4182 #J/m^3 specific heat of water
+
+	cooling_rate = q_net/(pw*cpw*D)*60 #C/min
+
+	st.write(plot_cooling_rate(cooling_rate))
+	st.write(plot_parcel_cooling(cooling_rate,T_water_C))
