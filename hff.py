@@ -27,9 +27,17 @@ lon = st.sidebar.number_input('longitude',value=-101.3644337)
 T_water_C = st.sidebar.number_input('water temperature (C)',value=2)
 D = st.sidebar.number_input('characteristic depth (m)',value=2)
 
-if st.sidebar.button('Get Current Forecast'):
-	
+if st.sidebar.button('Compute Heat Fluxes'):
+
 	df = get_full_forecast(lat,lon)
+
+	first_forecast_time = df.index[0]
+	timezone = first_forecast_time.tz
+	time_now = pd.Timestamp.now(tz=timezone)
+
+	if time_now-first_forecast_time > pd.Timedelta(hours=1):
+		get_full_forecast.clear()
+		df = get_full_forecast(lat,lon)	
 
 	q_sw, q_atm, q_b, q_l, q_h, q_net = calc_fluxes(df,T_water_C,lat,lon)
 
