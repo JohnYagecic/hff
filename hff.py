@@ -12,15 +12,6 @@ st.set_page_config(layout="wide")
 st.title('6.5 Day Heat Flux Forecast')
 st.write('Forecast met input data from NOAA Hourly Tabular Forecast Data')
 st.write('Heat Flux forecast from CRREL HeatFluxForecast model')
-col1, col2 = st.columns(2)
-
-#with col1:
-#   lat = st.number_input('latitude',value=41.1242)
-
-#with col2:
-#   lon = st.number_input('longitude',value=-101.3644337)
-#   T_water_C = st.number_input('water temperature (C)',value=2)
-#   D = st.number_input('characteristic depth (m)',value=2)
 
 lat = st.sidebar.number_input('latitude',value=41.1242)
 lon = st.sidebar.number_input('longitude',value=-101.3644337)
@@ -35,6 +26,8 @@ if st.sidebar.button('Compute Heat Fluxes'):
 	timezone = first_forecast_time.tz
 	time_now = pd.Timestamp.now(tz=timezone)
 
+	st.write(f'Current Time: {time_now}')
+	st.write(f'Current Forecast Start Time: {first_forecast_time}')
 	if time_now-first_forecast_time > pd.Timedelta(hours=1):
 		get_full_forecast.clear()
 		df = get_full_forecast(lat,lon)	
