@@ -161,5 +161,5 @@ def plot_met(df):
     df_met = pd.melt(df_met.reset_index(),id_vars='date')
     df_met = df_met.rename(columns={0:'variable'})
     g = sns.FacetGrid(df_met, row="variable",aspect=4,sharey=False,hue='variable')
-    g.map(sns.lineplot, "date", "value",he)
+    g.map(sns.lineplot, "date", "value")
     return g
