@@ -4,6 +4,7 @@ from pvlib.location import Location
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
+import streamlit as st
 
 def get_48h_hourly_forecast(lat,lon,AheadHour=0):
     #Direct Pandas Approach
@@ -38,6 +39,7 @@ def get_48h_hourly_forecast(lat,lon,AheadHour=0):
     df.index = df.index.tz_localize(tz=timezone)
     return df
 
+@st.cache
 def get_full_forecast(lat,lon):
     aheadhours = [48,96,107]
     df = get_48h_hourly_forecast(lat,lon,0)
