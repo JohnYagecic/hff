@@ -41,10 +41,7 @@ if st.sidebar.button('Compute Heat Fluxes'):
 	g = plot_met(df)
 	st.pyplot(g)
 
-	pw = 1000 #kg/m^3 density of water
-	cpw = 4182 #J/m^3 specific heat of water
-
-	cooling_rate = q_net/(pw*cpw*D)*60 #C/min
+	cooling_rate = calc_cooling_rate(q_net,D)
 
 	st.write(plot_cooling_rate(cooling_rate))
 	st.write(plot_parcel_cooling(cooling_rate,T_water_C))

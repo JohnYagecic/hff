@@ -1,3 +1,19 @@
+#-------------------------------------------------------------------------------
+# Name          Heat Flux Utilities
+# Description:  Collection of utilities to calculate heat fluxes on 
+#               the surface of a water body. Calculations are based
+#               on 6.5 day forecast of weather from forecast.weather.gov
+#               Methods are primarily based on the heat flux calculations
+#               documented in the HEC-RAS 5.0 Users Manual (2016)
+# Author:       Chandler Engel
+#               US Army Corps of Engineers
+#               Cold Regions Research and Engineering Laboratory (CRREL)
+#               Chandler.S.Engel@usace.army.mil
+# Created:      20 December 2022
+# Updated:      -
+#               
+#-------------------------------------------------------------------------------
+
 import numpy as np
 import pandas as pd
 from pvlib.location import Location
@@ -7,15 +23,9 @@ import datetime
 import streamlit as st
 
 def get_48h_hourly_forecast(lat,lon,AheadHour=0):
-    #Direct Pandas Approach
-    #lat = 43.7024
-    #lon = -72.2789
-
-    #lat = 41.1242
-    #lon = -101.3563
     url = rf'https://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=wc&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&w7=rain&w8=thunder&w9=snow&w10=fzg&w11=sleet&w13u=0&w16u=1&w17u=1&AheadHour={AheadHour}&Submit=Submit&FcstType=digital&textField1={lat}&textField2={lon}&site=all&unit=0&dd=&bw='
-    current_year = 2022
-    current_month = 12
+    current_year = datetime.now().year
+    current_month = datetime.now().month
     pd_tables = pd.read_html(url)
     table1 = pd_tables[7].iloc[1:17]
     table2 = pd_tables[7].iloc[18:35]
@@ -32,6 +42,7 @@ def get_48h_hourly_forecast(lat,lon,AheadHour=0):
     #make datetime index
     df.Date = df.Date.fillna(method='ffill')
     df[["month","day"]] = df["Date"].str.split("/", expand = True).astype(int)
+    #figure out if the data spans one year to the next and correct
     df['year'] = np.where(df['month']>=current_month, current_year, current_year+1)
     df['date'] = pd.to_datetime(df[['year', 'month', 'day']]) + pd.to_timedelta(df['hour'].astype(int), unit="h")
     df = df.set_index('date').drop(['Date','hour','month','day','year'],axis=1)
@@ -66,6 +77,8 @@ def calc_solar(q0_a_t,R,Cl):
 def calc_downwelling_LW(T_air,Cl):
     Tak = T_air + 273.15
     sbc = 5.670374419*10**-8 #W m-2 K-4
+    #emissivity from Zhang and Johnson 2016
+    #Zhang, Z. and Johnson, B.E., 2016. Aquatic nutrient simulation modules (NSMs) developed for hydrologic and hydraulic models.
     emissivity = 0.937*10**-5*(1+0.17*Cl**2)*Tak**2
     q_atm = emissivity*sbc*Tak**4
     return q_atm
@@ -87,6 +100,8 @@ def calc_latent_heat(P,T_water,ea,f_U):
     Twk = T_water + 273.15
     Lv = 2.500*10**6-2.386*10**3*(T_water)
     rho_w = 1000 #kg/m3
+    #emissivity from Zhang and Johnson 2016
+    #Zhang, Z. and Johnson, B.E., 2016. Aquatic nutrient simulation modules (NSMs) developed for hydrologic and hydraulic models.
     es = 6984.505294 + Twk*(-188.903931+Twk*(2.133357675+Twk*(-1.28858097*10**-2+Twk*(4.393587233*10**-5+Twk*(-8.023923082*10**-8+Twk*6.136820929*10**-11)))))
     ql = 0.622/P*Lv*rho_w*(es-ea)*f_U
     return ql
@@ -100,8 +115,10 @@ def calc_sensible_heat(T_air,f_U,T_water):
 def calc_fluxes(df,T_water_C,lat,lon):
     #calc solar input
     times = pd.date_range(start=df.index.min(), end=df.index.max(), freq='1H')
+    #hardcoded elevation at the moment
+    #update with call to https://open-elevation.com/
     elevation = 945 #m
-    site_name = 'paxton'
+    site_name = 'general location'
     tz = df.index.tz
     ghi = get_solar(lat,lon,elevation,site_name,times,tz).ghi
 
@@ -127,6 +144,7 @@ def calc_fluxes(df,T_water_C,lat,lon):
     U=df['Surface Wind (mph)'].astype(int)*0.44704
     f_U = calc_wind_function(a,b,c,R,U)
 
+    #calc latent heat
     T_dewpoint_C = (df['Dewpoint (°F)'].astype(int)-32)*(5/9)
     P = 1000 #mb don't have a forecast for this, but heat flux not that sensitive to it
     ea = calc_vapor_pressure(T_dewpoint_C)
@@ -139,6 +157,12 @@ def calc_fluxes(df,T_water_C,lat,lon):
     q_net = q_sw + q_atm - q_b + q_h - q_l
 
     return q_sw, q_atm, q_b, q_l, q_h, q_net
+
+def calc_cooling_rate(q_net,D):
+    pw = 1000 #kg/m^3 density of water
+    cpw = 4182 #J/m^3 specific heat of water
+    cooling_rate = q_net/(pw*cpw*D)*60 #C/min
+    return cooling_rate
 
 def build_energy_df(q_sw, q_atm, q_b, q_l, q_h):
     energy_df = pd.DataFrame({'downwelling SW':q_sw, 'downwelling LW':q_atm, 'upwelling LW':-q_b, 'sensible heat':q_h, 'latent heat':-q_l})
