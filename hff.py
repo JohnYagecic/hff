@@ -1,3 +1,16 @@
+#-------------------------------------------------------------------------------
+# Name          Heat Flux App Frontend
+# Description:  Streamlit app to display results of heat flux
+#				calculations using NWS hourly forecast data
+# Author:       Chandler Engel
+#               US Army Corps of Engineers
+#               Cold Regions Research and Engineering Laboratory (CRREL)
+#               Chandler.S.Engel@usace.army.mil
+# Created:      20 December 2022
+# Updated:      -
+#               
+#--
+
 import streamlit as st
 import numpy as np
 import pandas as pd
