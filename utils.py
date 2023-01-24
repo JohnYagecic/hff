@@ -24,8 +24,8 @@ import streamlit as st
 
 def get_48h_hourly_forecast(lat,lon,AheadHour=0):
     url = rf'https://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=wc&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&w7=rain&w8=thunder&w9=snow&w10=fzg&w11=sleet&w13u=0&w16u=1&w17u=1&AheadHour={AheadHour}&Submit=Submit&FcstType=digital&textField1={lat}&textField2={lon}&site=all&unit=0&dd=&bw='
-    current_year = datetime.now().year
-    current_month = datetime.now().month
+    current_year = datetime.datetime.now().year
+    current_month = datetime.datetime.now().month
     pd_tables = pd.read_html(url)
     table1 = pd_tables[7].iloc[1:17]
     table2 = pd_tables[7].iloc[18:35]
