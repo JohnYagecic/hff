@@ -21,6 +21,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 import streamlit as st
+import requests
+
+def get_elevation(lat,lon):
+    url = f'https://api.opentopodata.org/v1/ned10m?locations={lat},{lon}'
+    result = requests.get(url)
+    return result.json()['results'][0]['elevation']
 
 def get_48h_hourly_forecast(lat,lon,AheadHour=0):
     url = rf'https://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=wc&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&w7=rain&w8=thunder&w9=snow&w10=fzg&w11=sleet&w13u=0&w16u=1&w17u=1&AheadHour={AheadHour}&Submit=Submit&FcstType=digital&textField1={lat}&textField2={lon}&site=all&unit=0&dd=&bw='
@@ -100,7 +106,7 @@ def calc_latent_heat(P,T_water,ea,f_U):
     Twk = T_water + 273.15
     Lv = 2.500*10**6-2.386*10**3*(T_water)
     rho_w = 1000 #kg/m3
-    #emissivity from Zhang and Johnson 2016
+    #saturated vapor pressure at water temperature (mb), which is a function of water temperature from Zhang and Johnson 2016
     #Zhang, Z. and Johnson, B.E., 2016. Aquatic nutrient simulation modules (NSMs) developed for hydrologic and hydraulic models.
     es = 6984.505294 + Twk*(-188.903931+Twk*(2.133357675+Twk*(-1.28858097*10**-2+Twk*(4.393587233*10**-5+Twk*(-8.023923082*10**-8+Twk*6.136820929*10**-11)))))
     ql = 0.622/P*Lv*rho_w*(es-ea)*f_U
@@ -116,8 +122,8 @@ def calc_fluxes(df,T_water_C,lat,lon):
     #calc solar input
     times = pd.date_range(start=df.index.min(), end=df.index.max(), freq='1H')
     #hardcoded elevation at the moment
-    #update with call to https://open-elevation.com/
-    elevation = 945 #m
+    #elevation = 945 #m
+    elevation = get_elevation(lat,lon)
     site_name = 'general location'
     tz = df.index.tz
     ghi = get_solar(lat,lon,elevation,site_name,times,tz).ghi
