@@ -129,7 +129,7 @@ def calc_fluxes(df,T_water_C,lat,lon):
     ghi = get_solar(lat,lon,elevation,site_name,times,tz).ghi
 
     #calculate effects of clouds on shortwave
-    R=0
+    R=0.15 #Maidment and Chow Handbook of Hydrology
     Cl = df['Sky Cover (%)'].astype(int)/100
     q_sw = calc_solar(ghi,R,Cl)
 
@@ -166,7 +166,7 @@ def calc_fluxes(df,T_water_C,lat,lon):
 
 def calc_cooling_rate(q_net,D):
     pw = 1000 #kg/m^3 density of water
-    cpw = 4182 #J/m^3 specific heat of water
+    cpw = 4182 #J/kg-K specific heat of water
     cooling_rate = q_net/(pw*cpw*D)*60 #C/min
     return cooling_rate
 
