@@ -5,3 +5,4 @@ pvlib==0.9.3
 seaborn==0.12.1
 streamlit==1.16.0
 lxml==4.9.1
+html5lib==1.1
