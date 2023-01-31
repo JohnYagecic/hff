@@ -129,7 +129,7 @@ def calc_fluxes(df,T_water_C,lat,lon):
     ghi = get_solar(lat,lon,elevation,site_name,times,tz).ghi
 
     #calculate effects of clouds on shortwave
-    R=0.15 #Maidment and Chow Handbook of Hydrology
+    R=0.15 #Maidment et al. (1996) Handbook of Hydrology
     Cl = df['Sky Cover (%)'].astype(int)/100
     q_sw = calc_solar(ghi,R,Cl)
 
