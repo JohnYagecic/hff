@@ -121,6 +121,8 @@ def calc_sensible_heat(T_air,f_U,T_water):
 def calc_fluxes(df,T_water_C,lat,lon):
     #calc solar input
     times = pd.date_range(start=df.index.min(), end=df.index.max(), freq='1H')
+    #hardcoded elevation at the moment
+    #elevation = 945 #m
     elevation = get_elevation(lat,lon)
     site_name = 'general location'
     tz = df.index.tz
