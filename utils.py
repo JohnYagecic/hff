@@ -156,7 +156,7 @@ def calc_fluxes(df, T_water_C, lat, lon):
     # calc wind function
     a = 10 ** -6
     b = 10 ** -6
-    c = 1
+    c = 1.4
     R = 1
 
     U = df['Surface Wind (mph)'].astype(int) * 0.44704
