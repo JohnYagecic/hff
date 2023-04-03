@@ -25,6 +25,7 @@ st.set_page_config(layout="wide")
 st.title('6.5 Day Heat Flux Forecast')
 st.write('Forecast met input data from NOAA Hourly Tabular Forecast Data')
 st.write('Heat Flux forecast from CRREL HeatFluxForecast model')
+st.write('Based on Water Quality Module calculations in HEC-RAS')
 
 lat = st.sidebar.number_input('latitude', value=41.1242)
 lon = st.sidebar.number_input('longitude', value=-101.3644337)
