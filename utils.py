@@ -119,7 +119,7 @@ def calc_latent_heat(P, T_water, ea, f_U):
     # saturated vapor pressure at water temperature (mb), which is a function of water temperature from Zhang and Johnson 2016
     # Zhang, Z. and Johnson, B.E., 2016. Aquatic nutrient simulation modules (NSMs) developed for hydrologic and hydraulic models.
     es = 6984.505294 + Twk * (-188.903931 + Twk * (2.133357675 + Twk * (-1.28858097 * 10 ** -2 + Twk * (
-                4.393587233 * 10 ** -5 + Twk * (-8.023923082 * 10 ** -8 + Twk * 6.136820929 * 10 ** -11)))))
+            4.393587233 * 10 ** -5 + Twk * (-8.023923082 * 10 ** -8 + Twk * 6.136820929 * 10 ** -11)))))
     ql = 0.622 / P * Lv * rho_w * (es - ea) * f_U
     return ql
 
@@ -240,6 +240,7 @@ def plot_parcel_cooling(cooling_rate, T_water_C):
     plt.ylabel('Water Temp (C)', fontsize=12)
     return fig
 
+
 def tz_to_gmt_offset(tz_string):
     # time zone mappings in pytz uses the tz database and the signs are flipped for GMT
     # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -247,6 +248,8 @@ def tz_to_gmt_offset(tz_string):
     # NOAA reports the time in both standard and daylight so they need to be mapped to something in the tz database
     # Using US/Mountain wouldn't work I don't think because Arizona is in Standard time during Daylight time (ahh!!!)
     tz_map = {
+        'AKST': 'Etc/GMT+9',
+        'AKDT': 'Etc/GMT+8',
         'PST': 'Etc/GMT+8',
         'PDT': 'Etc/GMT+7',
         'MST': 'Etc/GMT+7',
