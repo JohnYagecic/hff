@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 from pvlib.location import Location
 import matplotlib.pyplot as plt
+import pytz
 import seaborn as sns
 import datetime
 import streamlit as st
@@ -45,14 +46,15 @@ def get_48h_hourly_forecast(lat, lon, ahead_hour=0):
     hours_col = df.columns[1]
     timezone = hours_col[5:].strip('()')
     gmt_tz = tz_to_gmt_offset(timezone)
+    pytz_gmt_tz = pytz.timezone(gmt_tz)
     df = df.rename(columns={hours_col: "hour"})
 
     # make datetime index
     df.Date = df.Date.fillna(method='ffill')
     df[["month", "day"]] = df["Date"].str.split("/", expand=True).astype(int)
     # figure out if the data spans one year to the next and correct
-    current_year = datetime.datetime.now(tz=gmt_tz).year
-    current_month = datetime.datetime.now(tz=gmt_tz).month
+    current_year = datetime.datetime.now(tz=pytz_gmt_tz).year
+    current_month = datetime.datetime.now(tz=pytz_gmt_tz).month
     df['year'] = np.where(df['month'] >= current_month, current_year, current_year + 1)
     df['date'] = pd.to_datetime(df[['year', 'month', 'day']]) + pd.to_timedelta(df['hour'].astype(int), unit="h")
     df = df.set_index('date').drop(['Date', 'hour', 'month', 'day', 'year'], axis=1)
