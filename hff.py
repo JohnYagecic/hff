@@ -35,6 +35,7 @@ D = st.sidebar.number_input('characteristic depth (m)', value=2)
 if st.sidebar.button('Compute Heat Fluxes'):
 
     df = get_full_forecast(lat, lon)
+    df = df.replace([np.inf, -np.inf], np.nan)
 
     first_forecast_time = df.index[0]
     timezone = first_forecast_time.tz
