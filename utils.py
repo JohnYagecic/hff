@@ -35,8 +35,10 @@ def get_48h_hourly_forecast(lat, lon, ahead_hour=0):
     url = rf'https://forecast.weather.gov/MapClick.php?w0=t&w1=td&w2=wc&w3=sfcwind&w3u=1&w4=sky&w5=pop&w6=rh&w7=rain&w8=thunder&w9=snow&w10=fzg&w11=sleet&w13u=0&w16u=1&w17u=1&AheadHour={ahead_hour}&Submit=Submit&FcstType=digital&textField1={lat}&textField2={lon}&site=all&unit=0&dd=&bw='
 
     pd_tables = pd.read_html(url)
-    table1 = pd_tables[7].iloc[1:17]
-    table2 = pd_tables[7].iloc[18:35]
+    table1 = pd_tables[4].iloc[1:17] #20241206 NWS appears to have changed their page a bit, new index is 4 not 7
+    table2 = pd_tables[4].iloc[18:35]
+    # table1 = pd_tables[7].iloc[1:17]
+    # table2 = pd_tables[7].iloc[18:35]
     table1.set_index(0, inplace=True)
     table2.set_index(0, inplace=True)
     df = pd.merge(table1, table2, left_index=True, right_index=True)
@@ -63,7 +65,7 @@ def get_48h_hourly_forecast(lat, lon, ahead_hour=0):
     return df
 
 
-@st.experimental_memo
+@st.cache_data
 def get_full_forecast(lat, lon):
     aheadhours = [48, 96, 107]
     df = get_48h_hourly_forecast(lat, lon, 0)
