@@ -38,7 +38,7 @@ def blurb():
 
     return blurb_text
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="Heat Flux Forecast", layout="wide")
 
 st.title('6.5 Day Heat Flux Forecast')
 st.write('Forecast met input data from NOAA Hourly Tabular Forecast Data')
