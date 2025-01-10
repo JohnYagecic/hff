@@ -31,16 +31,16 @@ def plot_forecast_heat_fluxes(energy_df):
         x='index',
         y='value',
         color='variable',
-        color_discrete_sequence=px.colors.qualitative.Bold,
+        # color_discrete_sequence=px.colors.qualitative.Bold,
         # If you want consistent coloring per variable, you could specify a dict:
-        # color_discrete_map={
-        #     'downwelling SW': 'blue',
-        #     'downwelling LW': 'orange',
-        #     'upwelling LW': 'green',
-        #     'sensible heat': 'red',
-        #     'latent heat': 'purple',
-        #     'net flux': 'black'
-        # },
+        color_discrete_map={
+            'downwelling SW': 'blue',
+            'downwelling LW': 'orange',
+            'upwelling LW': 'green',
+            'sensible heat': 'red',
+            'latent heat': 'purple',
+            'net flux': 'black'
+        },
     )
 
     # Make the 'net flux' line thicker and black
