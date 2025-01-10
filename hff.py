@@ -21,6 +21,23 @@ import datetime
 from utils import *
 from plots import *
 
+def blurb():
+    blurb_text = """
+
+    Downwelling SW (Shortwave Radiation): This represents the heat flux from incoming solar radiation that reaches the river's surface. Its magnitude fluctuates daily with the solar cycle, peaking during midday when sunlight is strongest.
+
+    Downwelling LW (Longwave Radiation): This flux captures the longwave radiation emitted by the atmosphere and surroundings toward the river. It tends to be relatively steady compared to shortwave radiation, influenced by cloud cover and atmospheric conditions.
+
+    Upwelling LW (Longwave Radiation): The heat flux emitted from the river's surface back into the atmosphere. This depends on the river's surface temperature, with warmer water emitting more longwave radiation.
+
+    Sensible Heat: The heat exchange between the river surface and the air due to differences in temperature. Positive values indicate heat transfer from the air to the river, while negative values indicate heat loss from the river to the air.
+
+    Latent Heat: The heat exchange associated with water evaporation or condensation at the river's surface. Evaporation (heat loss) is typically the dominant process, driven by humidity and wind.
+
+    Net Flux: The overall heat budget combining all the fluxes. A positive net flux indicates heat gain by the river, while a negative net flux indicates heat loss."""
+
+    return blurb_text
+
 st.set_page_config(layout="wide")
 
 st.title('6.5 Day Heat Flux Forecast')
@@ -42,6 +59,11 @@ if st.sidebar.button('Compute Heat Fluxes'):
     timezone = first_forecast_time.tz
     time_now = pd.Timestamp.now(tz=timezone)
 
+    with st.expander("Notes on Flux Terms", expanded=False):
+        st.write(blurb())
+
+    #st.write(blurb())
+
     #st.write(f'current timezone: {timezone}')
     st.write(f'Current Time: {time_now}')
     st.write(f'Current Forecast Start Time: {first_forecast_time}')
@@ -62,3 +84,5 @@ if st.sidebar.button('Compute Heat Fluxes'):
 
     st.write(plot_cooling_rate(cooling_rate))
     st.write(plot_parcel_cooling(cooling_rate, T_water_C))
+
+
