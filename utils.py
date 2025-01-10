@@ -10,16 +10,18 @@
 #               Cold Regions Research and Engineering Laboratory (CRREL)
 #               Chandler.S.Engel@usace.army.mil
 # Created:      20 December 2022
-# Updated:      -
+# Updated:      27 December 2024 -  Move plotting functions to separate file 
+#                                   Modify plots to use plotly for interactive visualization
 #
 # -------------------------------------------------------------------------------
 
 import numpy as np
 import pandas as pd
 from pvlib.location import Location
-import matplotlib.pyplot as plt
+
 import pytz
-import seaborn as sns
+
+
 import datetime
 import streamlit as st
 import requests
@@ -191,60 +193,16 @@ def calc_cooling_rate(q_net, D):
 
 def build_energy_df(q_sw, q_atm, q_b, q_l, q_h):
     energy_df = pd.DataFrame(
-        {'downwelling SW': q_sw, 'downwelling LW': q_atm, 'upwelling LW': -q_b, 'sensible heat': q_h,
-         'latent heat': -q_l})
+        {
+            'downwelling SW': q_sw, 
+            'downwelling LW': q_atm, 
+            'upwelling LW': -q_b, 
+            'sensible heat': q_h,
+            'latent heat': -q_l
+        }
+    )
     energy_df['net flux'] = energy_df.sum(axis=1)
     return energy_df
-
-
-def plot_forecast_heat_fluxes(energy_df):
-    energy_df = pd.melt(energy_df.reset_index(), id_vars='index')
-    fig, ax = plt.subplots(figsize=(15, 5))
-    ax = sns.lineplot(data=energy_df, x="index", y="value", hue='variable')
-    plt.ylabel('Heat Flux (W/m2)', fontsize=12)
-    plt.xlabel('')
-    return fig
-
-
-def plot_met(df):
-    columns = df.columns
-    df_met = df[[columns[0], columns[3], columns[6], columns[8]]]
-    df_met = df_met.rename(columns={columns[0]: 'Temperature F'})
-    df_met['Temperature C'] = (df_met['Temperature F'] - 32) * (5 / 9)
-    df_met['windspeed ms'] = df_met['Surface Wind (mph)'] * 0.44704
-    df_met = df_met.drop(['Temperature F', 'Surface Wind (mph)'], axis=1)
-    df_met = pd.melt(df_met.reset_index(), id_vars='date')
-    df_met = df_met.rename(columns={0: 'variable'})
-    g = sns.FacetGrid(df_met, row="variable", aspect=4, sharey=False, hue='variable')
-    g.map(sns.lineplot, "date", "value")
-    return g
-
-
-def plot_cooling_rate(cooling_rate):
-    fig, ax = plt.subplots(figsize=(15, 5))
-    ax = sns.lineplot(cooling_rate)
-    ax.axhline(-1.29 * 10 ** -3, linestyle='--', color='k')
-    plt.ylabel('Cooling Rate (C/min)', fontsize=12)
-    return fig
-
-
-def plot_parcel_cooling(cooling_rate, T_water_C):
-    cooling_rate_hr = cooling_rate * 60
-
-    temps = pd.DataFrame(cooling_rate_hr)
-    cooling_cumsum = cooling_rate_hr.cumsum()
-    for i in range(100):
-        c = cooling_cumsum - cooling_cumsum[i]
-        c[0:i] = 0
-        temps[i] = c
-    temps = temps + T_water_C
-    temps[temps < 0] = 0
-    temps = pd.melt(temps.reset_index(), id_vars='index')
-    fig, ax = plt.subplots(figsize=(15, 5))
-    ax = sns.lineplot(data=temps, x="index", y="value", hue='variable')
-    plt.ylabel('Water Temp (C)', fontsize=12)
-    return fig
-
 
 def tz_to_gmt_offset(tz_string):
     # time zone mappings in pytz uses the tz database and the signs are flipped for GMT

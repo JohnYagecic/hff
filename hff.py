@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 from utils import *
+from plots import *
 
 st.set_page_config(layout="wide")
 
@@ -52,10 +53,10 @@ if st.sidebar.button('Compute Heat Fluxes'):
 
     energy_df = build_energy_df(q_sw, q_atm, q_b, q_l, q_h)
     fig = plot_forecast_heat_fluxes(energy_df)
-    st.write(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
     g = plot_met(df)
-    st.pyplot(g)
+    st.plotly_chart(g, use_container_width=True)
 
     cooling_rate = calc_cooling_rate(q_net, D)
 
